@@ -1,0 +1,244 @@
+<!-- Click the "Download" or "Save" button on this block to get your index.html file -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ulam for Today 🍲</title>
+    <style>
+        :root {
+            --primary: #ff4757;
+            --secondary: #ffa502;
+            --dark: #2f3542;
+            --light: #f1f2f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: #747d8c;
+            margin-bottom: 25px;
+        }
+
+        .result-card {
+            margin-top: 10px;
+            padding: 25px;
+            border-radius: 15px;
+            background: #fff;
+            border: 2px solid #f1f2f6;
+            text-align: left;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.92) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .dish-name {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .dish-tag {
+            display: inline-block;
+            background: #ffeaa7;
+            color: #d63031;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .tag-container {
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .ingredients, .description {
+            margin-bottom: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .sparkle {
+            position: absolute;
+            background: var(--secondary);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: shoot 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes shoot {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--mx), var(--my)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <h1>Ulam for Today 🍲</h1>
+        <p class="subtitle"></p>
+        
+        <div class="result-card">
+            <div class="dish-name" id="dishName">-</div>
+            <div class="tag-container">
+                <span class="dish-tag" id="dishTag">-</span>
+            </div>
+            
+            <div class="section-title">💡 Why you should eat this today:</div>
+            <p class="description" id="dishDesc">-</p>
+            
+            <div class="section-title">🛒 Key Ingredients Needed:</div>
+            <p class="ingredients" id="dishIngredients">-</p>
+        </div>
+    </div>
+
+    <script>
+        const ulamDatabase = [
+            { name: "Sinigang na Baboy", tag: "Soup / Sour", desc: "A classic sour tamarind broth that is incredibly comforting on rainy days or cooler afternoons.", ingredients: "Pork belly, tamarind base, gabi (taro), white radish, kangkong, long green chili." },
+            { name: "Chicken Adobo", tag: "Saucy / Savory", desc: "The quintessential Filipino classic. Savory, vinegary, garlic-heavy, and tastes even better when reheated.", ingredients: "Chicken cuts, soy sauce, vinegar, crushed garlic cloves, whole peppercorns, bay leaves." },
+            { name: "Kare-Kare", tag: "Nutty / Rich", desc: "A luxurious peanut-based stew that balances beautifully with savory toasted shrimp paste (bagoong).", ingredients: "Oxtail or beef tripe, peanut butter, achuete oil, eggplant, string beans, banana blossoms." },
+            { name: "Crispy Pork Sisig", tag: "Dry / Fried", desc: "Sizzling, savory, and perfectly tangy. An absolute crowd favorite for parties or heavy lunches.", ingredients: "Pork ears/belly, onions, chicken liver, calamansi juice, chopped green chilies." },
+            { name: "Tinolang Manok", tag: "Soup / Ginger", desc: "A light ginger-flavored broth with chicken and greens. Excellent for boosting energy and staying warm.", ingredients: "Chicken pieces, wedges of green papaya or sayote, fresh ginger slices, sili leaves or malunggay." },
+            { name: "Bicol Express", tag: "Spicy / Creamy", desc: "A rich pork stew swimming in coconut milk and heavily loaded with fresh green and red chilies.", ingredients: "Pork belly, coconut milk/cream, shrimp paste (bagoong), long green chilies, siling labuyo." },
+            { name: "Lechon Paksiw", tag: "Sweet / Tangy", desc: "A wonderful way to transform roast pork into a rich, sweet, and tangy stew using traditional liver sauce.", ingredients: "Leftover lechon or pork roast, liver sauce (Mang Tomas), vinegar, brown sugar, garlic, bay leaves." },
+            { name: "Pinakbet", tag: "Veggie / Savory", desc: "A healthy, traditional vegetable dish from the north, flavored with savory fermented shrimp paste.", ingredients: "Bitter melon (ampalaya), eggplant, okra, squash (kalabasa), string beans, pork chunks, bagoong alamang." },
+            { name: "Pork Menudo", tag: "Tomato / Savory", desc: "A colorful, festive tomato stew cooked with small cubes of meat, liver, and fresh root vegetables.", ingredients: "Diced pork, pork liver, tomato sauce, potatoes, carrots, raisins, bell peppers, garbanzos." },
+            { name: "Ginataang Sitaw at Kalabasa", tag: "Creamy / Veggie", desc: "A rich and slightly sweet squash stew simmered in thick coconut cream, best topped with crispy pork or shrimp.", ingredients: "Squash (kalabasa), string beans (sitaw), coconut cream, shrimp or pork chunks, ginger, garlic." },
+            { name: "Pork Caldereta", tag: "Rich / Tomato", desc: "A premium, hearty tomato stew enriched with liver spread and cheese for a velvety, savory finish.", ingredients: "Pork chunks, tomato paste, liver spread, grated cheese, potatoes, carrots, bell peppers, olives." },
+            { name: "Beef Mechado", tag: "Tomato / Citrus", desc: "A thick beef stew layered with tomato sauce and spiked with citrus elements for a clean, sharp balance.", ingredients: "Beef chunks, soy sauce, calamansi or lemon, tomato sauce, potatoes, carrots, onions." },
+            { name: "Lumpiang Shanghai", tag: "Crispy / Fried", desc: "Crispy, golden spring rolls packed with seasoned ground meat. An addictive menu choice perfect with sweet chili sauce.", ingredients: "Ground pork, minced carrots, onions, garlic, egg, lumpia wrappers, dipping sauce." },
+            { name: "Nilagang Baka", tag: "Soup / Clear broth", desc: "A simple, clear beef soup slow-simmered until melt-in-your-mouth tender. Excellent comfort food.", ingredients: "Beef shank or brisket, cabbage, pechay, saba bananas, potatoes, whole black peppercorns." },
+            { name: "Inihaw na Liempo", tag: "Grilled / Smoky", desc: "Juicy pork belly marinated in soy sauce, calamansi, and garlic, grilled over charcoal to smoky perfection.", ingredients: "Pork belly slabs, soy sauce, calamansi, garlic, brown sugar, banana ketchup, ground pepper." },
+            { name: "Beef Pepper Steak", tag: "Stir-Fry / Savory", desc: "Tender beef slices stir-fried quickly with crunchy bell peppers in a rich, peppery soy-oyster sauce.", ingredients: "Beef strips, soy sauce, oyster sauce, green and red bell peppers, onions, cornstarch, black pepper." },
+            { name: "Pork Chop Steak (Pork Bistek)", tag: "Tangy / Onion-heavy", desc: "Filipino style pork cutlets braised in a punchy mixture of local citrus juice, soy sauce, and thick onion rings.", ingredients: "Pork chops, soy sauce, calamansi juice, lots of white onion rings, garlic, pepper." },
+            { name: "Ginataang Langka", tag: "Creamy / Veggie", desc: "Shredded unripe jackfruit cooked down in coconut milk, seasoned with chili and dried fish or pork chunks.", ingredients: "Unripe jackfruit (langka), coconut milk, shrimp paste or dried fish, siling haba, garlic, onion." },
+            { name: "Chicken Pastel", tag: "Creamy / Savory", desc: "A rich, velvety chicken stew cooked in a creamy milk sauce with sausages and colorful vegetables.", ingredients: "Chicken breast, evaporated milk or cream, chorizo/hotdogs, potatoes, carrots, green peas, mushrooms." },
+            { name: "Adobong Sitaw", tag: "Saucy / Veggie", desc: "An affordable, quick vegetable stir-fry applying the classic vinegary and savory adobo style cooking base.", ingredients: "String beans (sitaw), pork bits, soy sauce, vinegar, plenty of garlic, bay leaves." },
+            { name: "Pork Guisantes", tag: "Tomato / Savory", desc: "A homestyle stew featuring tender pork bits simmered in tomato sauce with sweet green peas.", ingredients: "Pork cubes, tomato sauce, green peas (guisantes), bell peppers, garlic, onion, fish sauce." },
+            { name: "Sinampalukang Manok", tag: "Soup / Very Sour", desc: "Similar to sinigang, but utilizing fresh tamarind leaves to give chicken broth a distinct, sharp sourness.", ingredients: "Chicken pieces, young tamarind leaves (or sinigang mix), ginger, lemongrass, sitaw, sili." },
+            { name: "Tortang Talong", tag: "Fried / Egg-based", desc: "Char-grilled eggplants flattened out, dipped in seasoned beaten eggs, and pan-fried until golden brown.", ingredients: "Whole eggplants, beaten eggs, salt, pepper, garlic, oil (optional ground pork stuffing)." },
+            { name: "Chicken Afritada", tag: "Tomato / Mild", desc: "A classic family-style chicken dish simmered gently in tomato sauce alongside potatoes and bell peppers.", ingredients: "Chicken parts, tomato sauce, potatoes, carrots, green bell peppers, green peas." },
+            { name: "Chop Suey", tag: "Stir-Fry / Crisp Veggies", desc: "A colorful medley of crisp vegetables stir-fried with meat slices and hard-boiled quail eggs in a savory glaze.", ingredients: "Cabbage, carrots, cauliflower, bell peppers, chicken strips, liver, quail eggs, cornstarch." },
+            { name: "Pork Binagoongan", tag: "Salty / Umami", desc: "Crispy pork chunks tossed in a heavy, deeply savory sauce made of fermented shrimp paste and chilies.", ingredients: "Pork belly, shrimp paste (bagoong), vinegar, sugar, garlic, eggplant slices, chili peppers." },
+            { name: "Ginisang Munggo", tag: "Savory / Budget-friendly", desc: "Mashing thick mung bean soup paired with pork rind crumbles (chicharon) and fresh bitter melon leaves.", ingredients: "Mung beans (munggo), chicharon or pork bits, tinapa (smoked fish) flakes, spinach or ampalaya leaves." },
+            { name: "Sweet and Sour Tilapia", tag: "Fried / Tangy sauce", desc: "Crispy fried whole tilapia fish drowned in a glossy, vibrant sweet and sour bell pepper glaze.", ingredients: "Whole tilapia, tomato ketchup, vinegar, sugar, carrots, ginger, bell peppers, cornstarch slurry." },
+            { name: "Daing na Bangus", tag: "Fried / Garlic-heavy", desc: "Milkfish butterfly cuts deeply marinated in vinegar, salt, and garlic, fried until intensely crispy.", ingredients: "Butterfly cut milkfish (bangus), vinegar, crushed garlic, peppercorns, salt, cooking oil." },
+            { name: "Pork Asado", tag: "Sweet / Soy-based", desc: "Tender pork cuts braised slowly in a sweet, star anise-scented soy sauce glaze until sticky.", ingredients: "Pork shoulder, soy sauce, brown sugar, star anise, tomato paste, garlic, bay leaves." },
+            { name: "Adobong Kangkong", tag: "Garlic-heavy / Veggie", desc: "Crispy water spinach stems sautéed quickly in a garlic-loaded, tangy adobo soy vinaigrette base.", ingredients: "Water spinach (kangkong), garlic, soy sauce, vinegar, pork bits or toasted garlic bits." },
+            { name: "Ginataang Tilapia", tag: "Creamy / Seafood", desc: "Whole fresh tilapia fish simmered gently in coconut cream layered with green leafy vegetables.", ingredients: "Tilapia fish, coconut milk, ginger, pechay or mustard greens, long green chilies." },
+            { name: "Laing", tag: "Spicy / Coconut-heavy", desc: "Shredded taro leaves slow-cooked in rich coconut milk until velvety and meltingly spicy.", ingredients: "Dried taro leaves, coconut cream, shrimp paste, pork bits, lots of bird's eye chilies (siling labuyo)." },
+            { name: "Beef Pochero", tag: "Tomato / Sweet-undertone", desc: "A robust beef stew loaded with sweet saba bananas, garbanzo beans, and fresh cabbage.", ingredients: "Beef brisket, tomato sauce, saba bananas, garbanzos, potatoes, cabbage, chorizo de bilbao." },
+            { name: "Misua na Patola", tag: "Soup / Light", desc: "A soothing, light soup using thin flour noodles, sweet sponge gourd, and seasoned ground pork balls.", ingredients: "Misua noodles, sponge gourd (patola), ground pork, garlic, onion, fish sauce, chicken broth." },
+            { name: "Ginisang Repolyo", tag: "Stir-Fry / Budget-friendly", desc: "A simple, affordable stir-fry of shredded green cabbage, carrots, and sweet bell peppers with pork bits.", ingredients: "Cabbage, carrots, pork slices, garlic, onion, soy sauce, black pepper." },
+            { name: "Pork Higado", tag: "Savory / Vinegar-kick", desc: "An authentic Ilocano dish featuring sliced pork and liver sautéed with bell peppers and green peas.", ingredients: "Pork tenderloin, pork liver, vinegar, soy sauce, bay leaves, bell peppers, green peas." },
+            { name: "Tokwa't Baboy", tag: "Fried / Tangy", desc: "Crispy fried tofu blocks and tender pork ears tossed in a vinegar-soy sauce dip with fresh onions.", ingredients: "Tofu blocks, pork belly/ears, soy sauce, vinegar, white onions, chili peppers." },
+            { name: "Crispy Pata", tag: "Fried / Indulgent", desc: "Whole pork leg pressure cooked then deep-fried to an incredibly crunchy texture. A feast centerpiece.", ingredients: "Whole pork leg (trotter), vinegar-garlic dip, peppercorns, star anise, salt, deep frying oil." },
+            { name: "Lechon Kawali", tag: "Fried / Crunchy", desc: "Super crispy deep-fried pork belly slabs chopped into cubes, best paired with rich liver sauce dip.", ingredients: "Pork belly slabs, salt, garlic, peppercorns, liver sauce (Mang Tomas) for serving." },
+            { name: "Dinuguan", tag: "Savory / Dark-gravy", desc: "A deeply savory pork blood stew simmered gently with vinegar, garlic, and long green chili peppers.", ingredients: "Pork meat/innards, pig's blood, vinegar, garlic, onion, long green chili (siling haba)." },
+            { name: "Adobong Pusit", tag: "Saucy / Seafood", desc: "Fresh squid simmered in its own dark ink paired with vinegar, soy sauce, and a mountain of garlic.", ingredients: "Squid, squid ink, vinegar, soy sauce, crushed garlic, onions, bay leaves." },
+            { name: "Sinigang na Hipon", tag: "Soup / Sour", desc: "Plump fresh shrimp cooked in a sour tamarind broth loaded with fresh local garden vegetables.", ingredients: "Shrimp, tamarind mix, radish, sitaw, kangkong, tomatoes, long green chili." },
+            { name: "Pork Estofado", tag: "Sweet / Fried Bananas", desc: "A savory pork stew made unique by simmering the meat with sweet fried saba banana slices.", ingredients: "Pork shoulder, soy sauce, vinegar, sugar, fried saba bananas, carrots, bay leaves." },
+            { name: "Ginataang Alimasag", tag: "Creamy / Seafood", desc: "Fresh sea crabs cracked open and simmered down in thick spiced chili coconut milk cream.", ingredients: "Crabs (alimasag), coconut cream, squash, string beans, ginger, long green chilies." },
+            { name: "Inun-unan (Paksiw na Isda)", tag: "Sour / Vinegar broth", desc: "A simple Visayan fish dish cooked down in a sharp vinegar broth with ginger and bitter melon.", ingredients: "Fresh fish (bangus or tuna), vinegar, ginger, garlic, finger chilies, ampalaya slices." },
+            { name: "Arroz Caldo", tag: "Soup / Rice porridge", desc: "A heavy, comforting ginger rice porridge loaded with chicken, toasted garlic, and hard-boiled eggs.", ingredients: "Glutinous rice, chicken pieces, fresh ginger, garlic, scallions, hard-boiled eggs, calamansi." },
+            { name: "Sarsyadong Isda", tag: "Saucy / Egg-based", desc: "A fantastic way to serve fried fish by braising it in a savory tomato and scrambled egg sauce pan.", ingredients: "Fried fish, tomatoes, beaten eggs, garlic, onion, fish sauce, green onions." }
+        
+        ];
+        
+        function getDishForToday() {
+            const today = new Date();
+            const dateIdentifier = (today.getFullYear() * 10000) + ((today.getMonth() + 1) * 100) + today.getDate();
+            const index = dateIdentifier % ulamDatabase.length;
+            return ulamDatabase[index];
+        }
+        
+        function createSparkles() {
+            const container = document.getElementById('mainContainer');
+            
+            for (let i = 0; i < 20; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                
+                const size = Math.random() * 6 + 4;
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 80 + 40;
+                
+                sparkle.style.width = `${size}px`;
+                sparkle.style.height = `${size}px`;
+                sparkle.style.left = '50%';
+                sparkle.style.top = '40%';
+                
+                sparkle.style.setProperty('--mx', `${Math.cos(angle) * distance}px`);
+                sparkle.style.setProperty('--my', `${Math.sin(angle) * distance}px`);
+                
+                container.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 600);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const todaysDish = getDishForToday();
+            
+            document.getElementById('dishName').innerText = todaysDish.name;
+            document.getElementById('dishTag').innerText = todaysDish.tag;
+            document.getElementById('dishDesc').innerText = todaysDish.desc;
+            document.getElementById('dishIngredients').innerText = todaysDish.ingredients;
+            
+            createSparkles();
+        });
+        
+    </script>
+</body>
+</html>
